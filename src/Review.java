@@ -74,8 +74,81 @@ public class Review{
     
     
     
-    // returns a string containing the specified file's contents. Words are single-space-delimited format (separated by a single space)
-     
     
+    // returns a single-space-delimited (separated by a single space) string of the specified file's content
+    public static String fileToString(String fileName) {
+        String text = "";
+        
+        try {
+            Scanner sc = new Scanner(new File(fileName));
+            
+            while (sc.hasNext()) {
+                text += sc.next() + " ";
+            }
+            sc.close();
+        } catch (Exception e) {
+            System.out.println("Error while fileToString; most likely file not found");
+        }
+        
+        //trim extra " " at the end
+        return text.trim(); 
+    }
+    
+    
+    
+    
+    // returns a given word's <double> sentiment value in hashmap if found; otherwise, return 0. (Handles for letter casing)
+    public static double getSentiment(String word) {
+        try                 {  return sentiment.get(word.toLowerCase());  }
+        catch(Exception e)  {  return 0;  }
+    }
+    
+    
+    
+    /* returns a word after deleting any punctuation attached to it from the original sentence like '?', '!', '.', etc...
+       this is to allow for seemless sentiment value retrieval when getSentiment is called and compares words.
+    */
+    pubic static String deletePunctuation(String word) {
+        // Character.isAlpabetic checks to see if the char is a unicode alpabet (not punctuation)
+        while (word.length() >= 1  &&  !Character.isAlphabetic(word.charAt(0))) {
+            word = word.substring(1);
+        }
+        
+        while (word.length >= 1  &&  !Character.isAlphabetic(word.charAt(word.length() - 1))) {
+            word = word.substring(0, word.length() - 1);
+        }
+        
+        return word
+    }
+    
+    
+    
+    // The next 2 methods return a random adjective (positive/negative) from their respective arraylists
+    public static String randomPositive() {
+        int a = (int) ( Math.random() * positiveAdj.size() );
+        return positiveAdj.get(a);
+    }
+    
+    public static String randomNegative() {
+        int a = (int) ( Math.random() * negativeAdj.size() );
+        return negativeAdj.get(a);
+    }    
+    
+    
+    
+    // returns a random adjective from either the Arraylist of positive adjectives or negative adjectives (chooses randomly)
+    public static String randomAdj() {
+        double rand = Math.random();
+        if (rand > 0.5) {
+            return randomPositive();
+        } else {
+            return randomNegative();
+        }
+    }
+    
+    
+    
+    
+
     
 }// class end
