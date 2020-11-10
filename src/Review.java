@@ -165,7 +165,7 @@ public class Review{
     
     // modifies the original review txt file by replacing all adjectives marked by '*' with relatively more negative adjectives, thus shaping the
     // the original review into a negative review. Same process is done for shaping it into a positive review.
-    public static String slantedNegative(String fileName) {
+    public static String slantMoreNegative(String fileName) {
         String rev = textToString(fileName);
         
         String negRev = "";
@@ -199,11 +199,11 @@ public class Review{
     
     
     
-    public static String slantedPositive(String fileName) {
+    public static String slantMorePositive(String fileName) {
         String rev = textToString(fileName);
         
-        String negRev = "";
-        String randNegWord = "";
+        String posRev = "";
+        String randPosWord = "";
         boolean hasAstr = false;
 
         String[] revWords = rev.split(" ");
@@ -213,21 +213,21 @@ public class Review{
 
             if (t.startsWith("*"))
             {
-                randNegWord = randomNegativeAdj();
+                randPosWord = randomPositive();
                 t = t.substring(1);
 
                 // Checks if random negative word created is more negative than original word. Note: won't work if original word has minimum sentiment value possible ("ugly")
-                while (sentimentVal(randNegWord) > sentimentVal(t))
-          	        randNegWord = randomNegativeAdj();
+                while (getSentiment(randPosWord) > getSentiment(t))
+          	        randPosWord = randomPositive();
         
-	            negRev += randNegWord + " ";
+	            posRev += randPosWord + " ";
                 
             } else {
-                negRev += t + " ";
+                posRev += t + " ";
             }
         }
 
-        return negRev;
+        return posRev;
     }
 
     
