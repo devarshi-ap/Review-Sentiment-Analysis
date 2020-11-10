@@ -96,17 +96,8 @@ public class Review{
     
     
     
-    
-    // returns a given word's <double> sentiment value in hashmap if found; otherwise, return 0. (Handles for letter casing)
-    public static double getSentiment(String word) {
-        try                 {  return sentiment.get(word.toLowerCase());  }
-        catch(Exception e)  {  return 0;  }
-    }
-    
-    
-    
     /* returns a word after deleting any punctuation attached to it from the original sentence like '?', '!', '.', etc...
-       this is to allow for seemless sentiment value retrieval when getSentiment is called and compares words.
+     * this is to allow for seemless sentiment value retrieval when getSentiment is called and compares words.
     */
     pubic static String deletePunctuation(String word) {
         // Character.isAlpabetic checks to see if the char is a unicode alpabet (not punctuation)
@@ -148,7 +139,96 @@ public class Review{
     
     
     
+    // returns a given word's <double> sentiment value in hashmap if found; otherwise, return 0. (Handles for letter casing)
+    public static double getSentiment(String word) {
+        try                 {  return sentiment.get(word.toLowerCase());  }
+        catch(Exception e)  {  return 0;  }
+    }
     
+    
+    
+    // returns the total sentiment value of all words in a given txt file
+    public static double totalSentiment(String filename) {
+        String fileContents = fileToString(filename);
+        
+        double sentimentTotal = 0;
+        String[] words = fileContents.split(" ");   // words in file.txt string are placed in array broken down by " ".
+
+        for (String w : words) {
+          sentimentTotal += getSentiment( deletePunctuation(w) );
+        }
+
+        return sentimentTotal;
+    }
+
+    
+    
+    // modifies the original review txt file by replacing all adjectives marked by '*' with relatively more negative adjectives, thus shaping the
+    // the original review into a negative review. Same process is done for shaping it into a positive review.
+    public static String slantedNegative(String fileName) {
+        String rev = textToString(fileName);
+        
+        String negRev = "";
+        String randNegWord = "";
+        boolean hasAstr = false;
+
+        String[] revWords = rev.split(" ");
+
+        
+        for (String t : revWords) {
+
+            if (t.startsWith("*"))
+            {
+                randNegWord = randomNegativeAdj();
+                t = t.substring(1);
+
+                // Checks if random negative word created is more negative than original word. Note: won't work if original word has minimum sentiment value possible ("ugly")
+                while (sentimentVal(randNegWord) > sentimentVal(t))
+          	        randNegWord = randomNegativeAdj();
+        
+	            negRev += randNegWord + " ";
+                
+            } else {
+                negRev += t + " ";
+            }
+        }
+
+        return negRev;
+    }
+    
+    
+    
+    
+    public static String slantedPositive(String fileName) {
+        String rev = textToString(fileName);
+        
+        String negRev = "";
+        String randNegWord = "";
+        boolean hasAstr = false;
+
+        String[] revWords = rev.split(" ");
+
+        
+        for (String t : revWords) {
+
+            if (t.startsWith("*"))
+            {
+                randNegWord = randomNegativeAdj();
+                t = t.substring(1);
+
+                // Checks if random negative word created is more negative than original word. Note: won't work if original word has minimum sentiment value possible ("ugly")
+                while (sentimentVal(randNegWord) > sentimentVal(t))
+          	        randNegWord = randomNegativeAdj();
+        
+	            negRev += randNegWord + " ";
+                
+            } else {
+                negRev += t + " ";
+            }
+        }
+
+        return negRev;
+    }
 
     
 }// class end
