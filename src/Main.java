@@ -6,13 +6,13 @@ class Main{
                 System.out.printf("Content:%n%s", Review.fileToString("SampleReview.txt"));
                 
                 // total sentiment value of file
-                System.out.printf("%n%nTotal Sentiment Value of \"SampleReview.txt\" :  %f%n", Review.totalSentiment("SampleReview.txt");
+                System.out.printf("%n%nTotal Sentiment Value of \"SampleReview.txt\" :  %f%n", Review.totalSentiment("SampleReview.txt"));
                 
                 // Negative slanted version of file
-                System.out.println("%nA more NEGATIVE version of \"SampleReview.txt\" :%n%s", Review.slantMoreNegative("SampleReview.txt");
+                System.out.println("%nA more NEGATIVE version of \"SampleReview.txt\" :%n%s", Review.slantMoreNegative("SampleReview.txt"));
                                    
                 // Positive slanted version of file
-                System.out.println("%nA more POSITIVE version of \"SampleReview.txt\" :%n%s", Review.slantMorePositive("SampleReview.txt");
+                System.out.println("%nA more POSITIVE version of \"SampleReview.txt\" :%n%s", Review.slantMorePositive("SampleReview.txt"));
                 
         
         }
