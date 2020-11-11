@@ -109,7 +109,7 @@ public class Review{
             word = word.substring(0, word.length() - 1);
         }
         
-        return word
+        return word;
     }
     
     
