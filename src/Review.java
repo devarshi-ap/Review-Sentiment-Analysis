@@ -96,22 +96,37 @@ public class Review{
     /* returns a word after deleting any punctuation attached to it from the original sentence like '?', '!', '.', etc...
      * this is to allow for seemless sentiment value retrieval when getSentiment is called and compares words.
     */
-    public static String deletePunctuation(String word) {
-        // Character.isAlpabetic checks to see if the char is a unicode alpabet (not punctuation)
-        while (word.length() >= 1  &&  !Character.isAlphabetic(word.charAt(0))) {
-            word = word.substring(1);
-        }
-        
-        while (word.length() >= 1  &&  !Character.isAlphabetic(word.charAt(word.length() - 1))) {
-            word = word.substring(0, word.length() - 1);
-        }
-        
-        return word;
-    }
+    public static String deletePunctuation( String word ) {
+    	while(word.length() > 0 && !Character.isAlphabetic(word.charAt(0))) {
+			word = word.substring(1);
+		}
+		while(word.length() > 0 && !Character.isAlphabetic(word.charAt(word.length()-1))) {
+			word = word.substring(0, word.length()-1);
+		}
+    
+    	return word;
+  	}
+
+
+
+	// returns the ending punctuation if there is any at all; otherwise retuns empty string
+	public static String retrievePunctuation( String word ) { 
+    	String p = "";
+
+		for(int i = word.length() - 1; i >= 0; i--) {
+
+			if( !Character.isLetterOrDigit(word.charAt(i)) ){
+				p = p + word.charAt(i);
+			} else {
+				return p;
+			}
+		}
+		return p;
+  	}
+
+
     
     
-    
-	
     // The next 2 methods return a random adjective (positive/negative) from their respective arraylists
     public static String randomPositive() {
         int a = (int) ( Math.random() * positiveAdj.size() );
@@ -121,7 +136,31 @@ public class Review{
     public static String randomNegative() {
         int a = (int) ( Math.random() * negativeAdj.size() );
         return negativeAdj.get(a);
-    }    
+    }
+
+
+
+	// returns a more negative adjective than the one specified.
+	public static String moreNegative(String word){
+		String randNegWord = randomNegative();
+
+        while (getSentiment(randNegWord) > getSentiment(word)) {
+          	randNegWord = randomNegative();
+        }
+
+		return randNegWord;
+	} 
+
+	// returns a more positive adjective than the one specified.
+	public static String morePositive(String word){
+		String randPosWord = randomPositive();
+
+        while (getSentiment(randPosWord) < getSentiment(word)) {
+          	randPosWord = randomPositive();
+        }
+
+		return randPosWord;
+	}    
     
     
     
@@ -149,18 +188,19 @@ public class Review{
     
 	
     // returns the total sentiment value of all words in a given txt file
-    public static double totalSentiment(String filename) {
-        String fileContents = fileToString(filename);
-        
-        double sentimentTotal = 0;
-        String[] words = fileContents.split(" ");   // words in file.txt string are placed in array broken down by " ".
+  	public static double totalSentiment(String filename) {
 
-        for (String w : words) {
-          sentimentTotal += getSentiment( deletePunctuation(w) );
-        }
+    	String fileContents = fileToString(filename);
+		String[] words = fileContents.split(" ");
+		double sentimentTotal = 0;
 
-        return sentimentTotal;
-    }
+
+		for (String w : words) {
+			sentimentTotal += getSentiment(deletePunctuation(w));
+		}
+
+    	return sentimentTotal;
+  	}
 	
 	
 	
@@ -168,64 +208,72 @@ public class Review{
     // modifies the original review txt file by replacing all adjectives marked by '*' with relatively more negative adjectives, thus shaping the
     // the original review into a negative review. Same process is done for shaping it into a positive review.
     public static String slantMoreNegative(String fileName) {
-        String rev = fileToString(fileName);
-        
-        String negRev = "";
-        String randNegWord = "";
-        String[] revWords = rev.split(" ");
 
-        
-        for (String t : revWords) {
+       	String rev = fileToString(fileName);
+	   	String word = "";
+		String negRev = "";
+		
+		
+		for (int i = 0; i < rev.length(); i++)
+		{
+			if ( ((rev.substring(i, i+1).equals(" ")) || (i == rev.length() - 1)) == false) {
+				word += rev.substring(i, i+1);
 
-            if (t.startsWith("*"))
-            {
-                randNegWord = randomNegative();
-                t = t.substring(1);
+			} else if (i == rev.length() - 1) {
+				word += rev.substring(rev.length() - 1, rev.length());
 
-                // Checks if random negative word created is more negative than original word. Note: won't work if original word has minimum sentiment value possible ("ugly")
-                while (getSentiment(randNegWord) > getSentiment(t))
-          	        randNegWord = randomNegative();
-        
-	            negRev += randNegWord + " ";
-                
-            } else {
-                negRev += t + " ";
-            }
-        }
+				if (word.substring(0, 1).equals("*")) {
+					negRev += moreNegative(deletePunctuation(word)) + retrievePunctuation(word);
+				} else {
+					negRev += word;
+				}
 
-        return negRev;
+			} else if (word.substring(0, 1).equals("*")) {
+				negRev += moreNegative(deletePunctuation(word)) + retrievePunctuation(word) + " ";
+				word = "";
+
+			} else {
+				negRev += word + " ";
+				word = "";
+			}
+		}
+		return negRev;
     }
     
     
     
     
     public static String slantMorePositive(String fileName) {
-        String rev = fileToString(fileName);
-        
-        String posRev = "";
-        String randPosWord = "";
-        String[] revWords = rev.split(" ");
+		
+       	String rev = fileToString(fileName);
+	   	String word = "";
+		String posRev = "";
+		
+		
+		for (int i = 0; i < rev.length(); i++)
+		{
+			if ( ((rev.substring(i, i+1).equals(" ")) || (i == rev.length() - 1)) == false) {
+				word += rev.substring(i, i+1);
 
+			} else if (i == rev.length() - 1) {
+				word += rev.substring(rev.length() - 1, rev.length());
 
-        for (String t : revWords) {
+				if (word.substring(0, 1).equals("*")) {
+					posRev += morePositive(deletePunctuation(word)) + retrievePunctuation(word);
+				} else {
+					posRev += word;
+				}
 
-            if (t.startsWith("*"))
-            {
-                randPosWord = randomPositive();
-                t = t.substring(1);
+			} else if (word.substring(0, 1).equals("*")) {
+				posRev += morePositive(deletePunctuation(word)) + retrievePunctuation(word) + " ";
+				word = "";
 
-                // Checks if random negative word created is more negative than original word. Note: won't work if original word has minimum sentiment value possible ("ugly")
-                while (getSentiment(randPosWord) > getSentiment(t))
-          	        randPosWord = randomPositive();
-        
-	            posRev += randPosWord + " ";
-                
-            } else {
-                posRev += t + " ";
-            }
-        }
-
-        return posRev;
+			} else {
+				posRev += word + " ";
+				word = "";
+			}
+		}
+		return posRev;
     }
 
     
